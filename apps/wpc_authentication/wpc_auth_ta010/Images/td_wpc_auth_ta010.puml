@@ -1,0 +1,22 @@
+@startuml TA010 WPC Authentication
+title TA010 WPC Authentication
+
+participant Customer
+participant WPC
+participant Host
+participant Charger
+
+group TPDS: Provisioning/Production
+    Customer -> WPC: Sign WPC Agreement
+    Customer -> Customer: Sign CSR based on Root CA Private Key
+    Customer -> Charger: Generate Device Private Key, Load Product Unit Certificate and WPC Chain Digest
+end
+
+Host <- Charger: Read Manufacturer and Product Unit Certificates
+Host -> Host: Verify Certificate Chain with Root CA
+Host <- Charger: Read WPC Chain Digest
+Host -> Host: Verify WPC Chain Digest
+Host <- Charger: Generate challenge and get signature response
+Host -> Host: Verify response to authenticate Charger
+
+@enduml

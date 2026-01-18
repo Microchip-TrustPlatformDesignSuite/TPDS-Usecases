@@ -1,0 +1,21 @@
+@startuml
+title TA010 Asymmetric Authentication
+
+participant Customer
+participant Host
+participant Accessory_Disposable
+
+group TPDS: Provisioning/Production
+    Customer -> Customer: Generate Custom PKI(Root CA) and sign CSR provided by Microchip 
+    Customer -> Accessory_Disposable: Slot 0 and 1 are loaded with certificate information
+end
+
+
+Host <- Accessory_Disposable: Read Signer and Device certificates
+Host -> Host: Verify Certificate Chain based on Root CA Public Key stored in the Host
+Host -> Accessory_Disposable: Generate Challenge and share it with Accessory/Disposable
+Host <- Accessory_Disposable: Accessory/Disposable signs the Challenge and sends back the Response
+Host -> Host: Verify the Response (ECDSA verification)
+Host -> Accessory_Disposable: Authenticate Accessory/Disposable device if verification is successful
+
+@enduml

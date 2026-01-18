@@ -1,0 +1,35 @@
+@startuml ATECC608-TMNGTLS keySTREAM Firmware Over-The-Air Update
+title ATECC608-TMNGTLS keySTREAM Firmware Over-The-Air Update
+
+participant Customer
+participant TPDS
+participant Host
+participant ATECC608
+participant keySTREAM
+
+group Provisioning
+    Customer <-> keySTREAM: Register and configure keySTREAM account
+    Customer <-> keySTREAM: Generate signing key pair in keySTREAM.
+    Customer <-> Customer: Develop initial components (e.g., bootloader, application)
+    TPDS <-> keySTREAM: Request and obtain signatures for initial components
+    TPDS -> keySTREAM: Retrieve signing public key
+    TPDS -> ATECC608: Load signing public key
+    TPDS <-> Host: Provision signed initial components to Host MCU
+end
+
+Customer -> keySTREAM: Upload updated component when available.
+Host <-> keySTREAM: Connect and retrieve current component version information
+Host -> Host: Determine if component update is required
+alt Component is outdated
+    Host -> keySTREAM: Download latest component
+    Host <-> ATECC608: Verify signature of downloaded component
+    alt Signature verification successful
+        Host -> Host: Install updated component
+    else Signature verification failed
+        Host -> Host: Abort installation and log error
+    end
+else Component is up to date
+    Host -> Host: No action required
+end
+
+@enduml
